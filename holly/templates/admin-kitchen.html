@@ -1,0 +1,148 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Kitchen</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { display: flex; height: 100vh; background-color: #f4f6f9; }
+        .sidebar { width: 250px; background: #ffffff; border-right: 1px solid #ddd; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; }
+        .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid #eee; flex-shrink: 0; }
+        .brand img { height: 35px; } .brand span { font-weight: bold; font-size: 18px; color: #333; }
+        .menu-item { padding: 12px 15px; color: #555; text-decoration: none; border-radius: 6px; margin-bottom: 5px; font-size: 13px; display: flex; align-items: center; gap: 12px; transition: 0.2s; flex-shrink: 0; }
+        .menu-item i { width: 16px; text-align: center; font-size: 14px; }
+        .menu-item:hover { background-color: #e8f0fe; color: #1a73e8; }
+        .menu-item.active { background-color: #1a73e8; color: white; }
+        .menu-category { font-size: 11px; font-weight: bold; color: #999; margin-top: 15px; margin-bottom: 5px; text-transform: uppercase; padding-left: 15px; }
+        .logout { margin-top: auto; color: #1a73e8; } .logout:hover { background-color: #e8f0fe; }
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-title { font-size: 24px; font-weight: bold; color: #333; }
+        .btn-add { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .btn-add:hover { background: #0d47a1; }
+        .table-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background-color: transparent; color: #000000; border-bottom: 2px solid #333; }
+        th, td { padding: 12px 15px; text-align: left; font-size: 13px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        th { font-weight: 800; }
+        .preview-img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
+        .action-btn { border: none; background: transparent; cursor: pointer; font-size: 14px; margin-left: 5px; }
+        .edit-btn { color: #1976d2; }
+        .delete-btn { color: #d32f2f; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay.show { display: flex; }
+        .modal-card { background: white; width: 500px; padding: 25px; border-radius: 8px; max-height: 90vh; overflow-y: auto; }
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        .form-input, .form-select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .btn-cancel { background: #eee; color: #333; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="brand"><img src="https://hollyblueinterio.com/images/abc/logo.png" alt="Logo"><span></span></div>
+        <a href="/custom-admin-dashboard/" class="menu-item"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+        <a href="/admin-floorplans/" class="menu-item"><i class="fa-solid fa-house"></i> Home</a>
+        <div class="menu-category">Modules</div>
+        <a href="/admin-kitchen/" class="menu-item active"><i class="fa-solid fa-utensils"></i> Kitchen</a>
+        <a href="/admin-accessories/" class="menu-item"><i class="fa-solid fa-box-open"></i> Kitchen Accessories</a>
+        <a href="{% url 'admin_modules' 'TV Unit' %}" class="menu-item"><i class="fa-solid fa-tv"></i> TV Unit</a>
+        <a href="{% url 'admin_modules' 'Washing Unit' %}" class="menu-item"><i class="fa-solid fa-shirt"></i> Washing Unit</a>
+        <a href="{% url 'admin_modules' 'Mirror' %}" class="menu-item"><i class="fa-regular fa-square"></i> Mirror</a>
+        <a href="{% url 'admin_modules' 'Partition' %}" class="menu-item"><i class="fa-solid fa-table-columns"></i> Partition</a>
+        <a href="{% url 'admin_modules' 'Break Fast Table' %}" class="menu-item"><i class="fa-solid fa-mug-hot"></i> Breakfast Table</a>
+        <a href="{% url 'admin_modules' 'BedCOT' %}" class="menu-item"><i class="fa-solid fa-bed"></i> BedCOT</a>
+        <a href="{% url 'admin_modules' 'Head Board' %}" class="menu-item"><i class="fa-solid fa-layer-group"></i> Head Board</a>
+        <a href="{% url 'admin_modules' 'Wall Panel' %}" class="menu-item"><i class="fa-solid fa-border-all"></i> Wall Panel</a>
+        <a href="{% url 'admin_modules' 'Texture Paint' %}" class="menu-item"><i class="fa-solid fa-paint-roller"></i> Texture Paint</a>
+        <a href="{% url 'admin_modules' 'Side Table' %}" class="menu-item"><i class="fa-solid fa-cube"></i> Side Table</a>
+        <a href="{% url 'admin_modules' 'Wardrobe' %}" class="menu-item"><i class="fa-solid fa-door-closed"></i> Wardrobe</a>
+        <a href="{% url 'admin_modules' 'Dressing' %}" class="menu-item"><i class="fa-solid fa-user-tie"></i> Dressing</a>
+        <a href="{% url 'admin_modules' 'Vanity' %}" class="menu-item"><i class="fa-solid fa-bath"></i> Vanity</a>
+        <a href="/custom-admin-login/" class="menu-item logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="page-title">Manage Kitchen</div>
+            <button class="btn-add" onclick="openModal('addModal')"><i class="fa-solid fa-plus"></i> Add Item</button>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead><tr><th>Item Name</th><th>Shape</th><th>Material</th><th>Size (LxDxH)</th><th>Price</th><th>Image</th><th>Action</th></tr></thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr id="row-{{ item.id }}">
+                        <td>{{ item.name }}</td><td>{{ item.kitchen_shape }}</td><td>{{ item.material }}</td>
+                        <td>{{ item.length }}x{{ item.depth }}x{{ item.height }}</td>
+                        <td style="color:#1a73e8; font-weight:bold;">₹ {{ item.price }}</td>
+                        <td><img src="{{ item.image.url }}" class="preview-img"></td>
+                        <td>
+                            <button class="action-btn edit-btn" onclick="openEditModal('{{ item.id }}', '{{ item.name }}', '{{ item.kitchen_shape }}', '{{ item.unit_type }}', '{{ item.material }}', '{{ item.length }}', '{{ item.depth }}', '{{ item.height }}', '{{ item.price }}', '{{ item.specification|escapejs }}')"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-btn delete-btn" onclick="deleteItem('{{ item.id }}')"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    {% empty %}<tr><td colspan="7" style="text-align:center;">No Items Added</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="addModal">
+        <div class="modal-card">
+            <div style="font-size:18px; font-weight:bold; margin-bottom:20px;">Add Kitchen Item</div>
+            <form id="addForm" onsubmit="submitAddForm(event)">
+                <div class="form-group"><label class="form-label">Name</label><input type="text" name="name" class="form-input" required></div>
+                <div class="form-group"><label class="form-label">Shape</label><select name="kitchen_shape" class="form-select"><option value="STRAIGHT KITCHEN">Straight Kitchen</option><option value="L SHAPE KITCHEN">L Shape Kitchen</option><option value="U SHAPE KITCHEN">U Shape Kitchen</option></select></div>
+                <div class="form-group"><label class="form-label">Type</label><select name="unit_type" class="form-select"><option value="BOTTOM UNIT">Bottom Unit</option><option value="WALL UNIT">Wall Unit</option></select></div>
+                <div class="form-group"><label class="form-label">Material</label><select name="material" class="form-select"><option value="PLY WITH LAM">Ply with Lam</option><option value="PLY WITH ACRYLIC">Ply with Acrylic</option><option value="PLY WITH VENEER">Ply with Veneer</option><option value="WPC WITH LAM">WPC with Lam</option></select></div>
+                <div class="form-group"><label class="form-label">Dimensions</label><div style="display:flex; gap:10px;"><input type="number" name="length" class="form-input" placeholder="L" required><input type="number" name="depth" class="form-input" placeholder="D" required><input type="number" name="height" class="form-input" placeholder="H" required></div></div>
+                <div class="form-group"><label class="form-label">Price</label><input type="number" name="price" class="form-input" required></div>
+                <div class="form-group"><label class="form-label">Image</label><input type="file" name="image" class="form-input" required accept="image/*"></div>
+                <div class="form-group"><label class="form-label">Spec</label><textarea name="specification" class="form-input" rows="2"></textarea></div>
+                <div class="modal-actions"><button type="button" class="btn-cancel" onclick="closeModal('addModal')">Cancel</button><button type="submit" class="btn-add">Save</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-card">
+            <div style="font-size:18px; font-weight:bold; margin-bottom:20px;">Edit Kitchen Item</div>
+            <form id="editForm" onsubmit="submitEditForm(event)">
+                <input type="hidden" id="editId">
+                <div class="form-group"><label class="form-label">Name</label><input type="text" id="editName" name="name" class="form-input" required></div>
+                <div class="form-group"><label class="form-label">Shape</label><select id="editShape" name="kitchen_shape" class="form-select"><option value="STRAIGHT KITCHEN">Straight Kitchen</option><option value="L SHAPE KITCHEN">L Shape Kitchen</option><option value="U SHAPE KITCHEN">U Shape Kitchen</option></select></div>
+                <div class="form-group"><label class="form-label">Type</label><select id="editType" name="unit_type" class="form-select"><option value="BOTTOM UNIT">Bottom Unit</option><option value="WALL UNIT">Wall Unit</option></select></div>
+                <div class="form-group"><label class="form-label">Material</label><select id="editMaterial" name="material" class="form-select"><option value="PLY WITH LAM">Ply with Lam</option><option value="PLY WITH ACRYLIC">Ply with Acrylic</option><option value="PLY WITH VENEER">Ply with Veneer</option><option value="WPC WITH LAM">WPC with Lam</option></select></div>
+                <div class="form-group"><label class="form-label">Dimensions</label><div style="display:flex; gap:10px;"><input type="number" id="editL" name="length" class="form-input" placeholder="L"><input type="number" id="editD" name="depth" class="form-input" placeholder="D"><input type="number" id="editH" name="height" class="form-input" placeholder="H"></div></div>
+                <div class="form-group"><label class="form-label">Price</label><input type="number" id="editPrice" name="price" class="form-input" required></div>
+                <div class="form-group"><label class="form-label">Image (Optional)</label><input type="file" name="image" class="form-input" accept="image/*"></div>
+                <div class="form-group"><label class="form-label">Spec</label><textarea id="editSpec" name="specification" class="form-input" rows="2"></textarea></div>
+                <div class="modal-actions"><button type="button" class="btn-cancel" onclick="closeModal('editModal')">Cancel</button><button type="submit" class="btn-add">Update</button></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) { document.getElementById(id).classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+        function openEditModal(id, name, shape, type, mat, l, d, h, price, spec) {
+            document.getElementById('editId').value = id; document.getElementById('editName').value = name;
+            document.getElementById('editShape').value = shape; document.getElementById('editType').value = type;
+            document.getElementById('editMaterial').value = mat; document.getElementById('editL').value = l;
+            document.getElementById('editD').value = d; document.getElementById('editH').value = h;
+            document.getElementById('editPrice').value = price; document.getElementById('editSpec').value = spec;
+            openModal('editModal');
+        }
+
+        function submitAddForm(e) { e.preventDefault(); const fd = new FormData(document.getElementById('addForm')); fetch('/api/add-kitchen/', {method:'POST', body:fd}).then(r=>r.json()).then(d=>{if(d.status==='success')location.reload();}); }
+        function submitEditForm(e) { e.preventDefault(); const id=document.getElementById('editId').value; const fd = new FormData(document.getElementById('editForm')); fetch(`/api/update-kitchen/${id}/`, {method:'POST', body:fd}).then(r=>r.json()).then(d=>{if(d.status==='success')location.reload();}); }
+        function deleteItem(id) { if(confirm('Delete?')) fetch(`/api/delete-kitchen/${id}/`, {method:'DELETE'}).then(r=>r.json()).then(d=>{if(d.status==='success')location.reload();}); }
+    </script>
+</body>
+</html>

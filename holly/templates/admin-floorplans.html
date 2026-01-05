@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Floor Plans</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { display: flex; height: 100vh; background-color: #f4f6f9; }
+
+        /* SIDEBAR */
+        .sidebar { width: 250px; background: #ffffff; border-right: 1px solid #ddd; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; flex-shrink: 0; }
+        .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid #eee; flex-shrink: 0; }
+        .brand img { height: 35px; } .brand span { font-weight: bold; font-size: 18px; color: #333; }
+
+        .menu-item { padding: 12px 15px; color: #555; text-decoration: none; border-radius: 6px; margin-bottom: 5px; font-size: 13px; display: flex; align-items: center; gap: 12px; transition: 0.2s; flex-shrink: 0; }
+        .menu-item i { width: 16px; text-align: center; font-size: 14px; }
+        .menu-item:hover { background-color: #e8f0fe; color: #1a73e8; }
+        .menu-item.active { background-color: #1a73e8; color: white; }
+        .menu-category { font-size: 11px; font-weight: bold; color: #999; margin-top: 15px; margin-bottom: 5px; text-transform: uppercase; padding-left: 15px; }
+        .logout { margin-top: auto; color: #1a73e8; } .logout:hover { background-color: #e8f0fe; }
+
+        /* MAIN CONTENT */
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-title { font-size: 24px; font-weight: bold; color: #333; }
+
+        .btn-add { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-add:hover { background: #0d47a1; }
+
+        /* TABLE */
+        .table-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px 15px; border-bottom: 2px solid #333; font-weight: 800; font-size: 13px; }
+        td { padding: 12px 15px; border-bottom: 1px solid #eee; font-size: 13px; vertical-align: middle; }
+        .preview-img { width: 80px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
+
+        /* ACTION BUTTONS */
+        .action-btn { border: none; background: transparent; cursor: pointer; font-size: 14px; margin-left: 8px; }
+        .edit-btn { color: #1976d2; }
+        .delete-btn { color: #d32f2f; }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay.show { display: flex; }
+        .modal-card { background: white; width: 400px; padding: 25px; border-radius: 8px; }
+        .form-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 15px; }
+        .btn-cancel { background: #eee; color: #333; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="brand"><img src="https://hollyblueinterio.com/images/abc/logo.png" alt="Logo"><span></span></div>
+        <a href="/custom-admin-dashboard/" class="menu-item"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+        <a href="/admin-floorplans/" class="menu-item active"><i class="fa-solid fa-house"></i> Home</a>
+
+        <div class="menu-category">Modules</div>
+        <a href="/admin-kitchen/" class="menu-item"><i class="fa-solid fa-utensils"></i> Kitchen</a>
+        <a href="/admin-accessories/" class="menu-item"><i class="fa-solid fa-box-open"></i> Kitchen Accessories</a>
+        <a href="{% url 'admin_modules' 'TV Unit' %}" class="menu-item"><i class="fa-solid fa-tv"></i> TV Unit</a>
+        <a href="{% url 'admin_modules' 'Washing Unit' %}" class="menu-item"><i class="fa-solid fa-shirt"></i> Washing Unit</a>
+        <a href="{% url 'admin_modules' 'Mirror' %}" class="menu-item"><i class="fa-regular fa-square"></i> Mirror</a>
+        <a href="{% url 'admin_modules' 'Partition' %}" class="menu-item"><i class="fa-solid fa-table-columns"></i> Partition</a>
+        <a href="{% url 'admin_modules' 'Break Fast Table' %}" class="menu-item"><i class="fa-solid fa-mug-hot"></i> Breakfast Table</a>
+        <a href="{% url 'admin_modules' 'Bedcot' %}" class="menu-item"><i class="fa-solid fa-bed"></i> Bedcot</a>
+        <a href="{% url 'admin_modules' 'Head Board' %}" class="menu-item"><i class="fa-solid fa-layer-group"></i> Head Board</a>
+        <a href="{% url 'admin_modules' 'Wall Panel' %}" class="menu-item"><i class="fa-solid fa-border-all"></i> Wall Panel</a>
+        <a href="{% url 'admin_modules' 'Texture Paint' %}" class="menu-item"><i class="fa-solid fa-paint-roller"></i> Texture Paint</a>
+        <a href="{% url 'admin_modules' 'Side Table' %}" class="menu-item"><i class="fa-solid fa-cube"></i> Side Table</a>
+        <a href="{% url 'admin_modules' 'Wardrobe' %}" class="menu-item"><i class="fa-solid fa-door-closed"></i> Wardrobe</a>
+        <a href="{% url 'admin_modules' 'Dressing' %}" class="menu-item"><i class="fa-solid fa-user-tie"></i> Dressing</a>
+        <a href="{% url 'admin_modules' 'Vanity' %}" class="menu-item"><i class="fa-solid fa-bath"></i> Vanity</a>
+
+        <a href="/custom-admin-login/" class="menu-item logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="page-title">Manage Floor Plans</div>
+            <button class="btn-add" onclick="openModal('addModal')">Add Floor Plan</button>
+        </div>
+        <div class="table-card">
+            <table>
+                <thead><tr><th>Plan Name</th><th>Image</th><th>Action</th></tr></thead>
+                <tbody>
+                    {% for plan in plans %}
+                    <tr id="row-{{ plan.id }}">
+                        <td>{{ plan.name }}</td>
+                        <td><img src="{{ plan.image.url }}" class="preview-img"></td>
+                        <td>
+                            <button class="action-btn edit-btn" onclick="openEditModal('{{ plan.id }}', '{{ plan.name }}')">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deletePlan('{{ plan.id }}')">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}<tr><td colspan="3" style="text-align:center;">No plans added yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="addModal">
+        <div class="modal-card">
+            <h3 style="margin-bottom:15px;">Add Floor Plan</h3>
+            <form id="addForm" onsubmit="submitAdd(event)">
+                <div class="form-group"><input type="text" name="name" class="form-input" placeholder="Name" required></div>
+                <div class="form-group"><input type="file" name="image" class="form-input" required></div>
+                <div style="text-align:right;">
+                    <button type="button" class="btn-cancel" onclick="closeModal('addModal')">Cancel</button>
+                    <button type="submit" class="btn-add">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-card">
+            <h3 style="margin-bottom:15px;">Edit Floor Plan</h3>
+            <form id="editForm" onsubmit="submitEdit(event)">
+                <input type="hidden" id="editId">
+                <div class="form-group"><input type="text" id="editName" name="name" class="form-input" placeholder="Name" required></div>
+                <div class="form-group">
+                    <label style="font-size:12px; font-weight:bold; color:#555;">New Image (Optional)</label>
+                    <input type="file" name="image" class="form-input">
+                </div>
+                <div style="text-align:right;">
+                    <button type="button" class="btn-cancel" onclick="closeModal('editModal')">Cancel</button>
+                    <button type="submit" class="btn-add">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) { document.getElementById(id).classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+        function openEditModal(id, name) {
+            document.getElementById('editId').value = id;
+            document.getElementById('editName').value = name;
+            openModal('editModal');
+        }
+
+        function submitAdd(e) {
+            e.preventDefault();
+            const fd = new FormData(document.getElementById('addForm'));
+            fetch('/api/add-floorplan/', { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(d => { if(d.status === 'success') location.reload(); else alert('Error'); });
+        }
+
+        function submitEdit(e) {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const fd = new FormData(document.getElementById('editForm'));
+
+            // This URL must match your urls.py path for update
+            fetch(`/api/update-floorplan/${id}/`, { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(d => { if(d.status === 'success') location.reload(); else alert('Error updating'); });
+        }
+
+        function deletePlan(id) {
+            if(confirm('Delete?')) {
+                fetch(`/api/delete-floorplan/${id}/`, { method: 'DELETE' })
+                .then(r => r.json())
+                .then(d => { if(d.status === 'success') location.reload(); });
+            }
+        }
+    </script>
+</body>
+</html>

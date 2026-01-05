@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 2 – Select Units</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+
+        body {
+            background-image: url("https://images.unsplash.com/photo-1618219908412-a29a1bb7b86e?q=80&w=2000&auto=format&fit=crop");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .page-overlay { background: rgba(0, 0, 0, 0.5); min-height: 100vh; padding-bottom: 40px; }
+
+        /* TOP BAR */
+        .top-bar-wrapper { padding: 16px 40px 0; }
+        .top-bar {
+            height: 70px; background: white; border-radius: 16px; padding: 0 30px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .logo-img { height: 40px; width: auto; }
+
+        /* Navigation Links Styling */
+        .nav-links { display: flex; gap: 24px; font-size: 13px; }
+        .nav-links a { color: #333; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+        .nav-links a:hover { color: #1a73e8; text-decoration: underline; }
+
+        /* MAIN CARD */
+        .main-container { display: flex; justify-content: center; padding: 60px 0; }
+        .card {
+            width: 70%; max-width: 900px; background: white; padding: 40px 50px;
+            border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+        .page-title { text-align: center; font-size: 22px; margin-bottom: 5px; }
+        .page-step { text-align: center; font-size: 12px; color: #777; margin-bottom: 30px; }
+        .section-title { font-size: 16px; margin-bottom: 12px; }
+        .button-group { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+
+        /* BUTTONS */
+        .btn-option {
+            border: 1px solid #1a73e8; padding: 10px 24px; border-radius: 4px;
+            font-size: 12px; color: #1a73e8; background: #fff; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-option:hover { background: #1a73e8; color: #fff; }
+        .btn-option.completed { background-color: #2e7d32; color: white; border-color: #2e7d32; }
+        .btn-option.completed::after { content: " ✔"; font-weight: bold; }
+
+        .btn-back, .btn-next {
+            text-decoration: none; color: white; padding: 10px 30px; border-radius: 4px;
+            font-size: 12px; display: inline-block; margin: 8px 5px 0; border: none; cursor: pointer;
+        }
+        .btn-back { background: #777; } .btn-back:hover { background: #555; }
+        .btn-next { background: #1a73e8; } .btn-next:hover { background: #0d47a1; }
+
+        /* MODALS */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65);
+            display: none; align-items: center; justify-content: center; z-index: 2000;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-card {
+            width: 800px; max-width: 95%; background: #ffffff;
+            border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+            padding: 24px; position: relative;
+            max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column;
+        }
+        .modal-header { margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; flex-shrink: 0; }
+        .modal-title { font-size: 18px; font-weight: bold; color: #333; }
+        .modal-close {
+            position: absolute; top: 15px; right: 15px; border: none;
+            background: transparent; font-size: 24px; color: #777; cursor: pointer; line-height: 1;
+        }
+        .modal-section { margin-bottom: 16px; flex-shrink: 0; }
+        .modal-label { font-size: 13px; margin-bottom: 6px; display: block; color: #444; font-weight: 500; }
+        .modal-select, .modal-input { width: 100%; padding: 10px; font-size: 13px; border-radius: 4px; border: 1px solid #ccc; }
+        .modal-input-fixed { background-color: #f0f0f0; color: #555; border: 1px solid #ccc; pointer-events: none; }
+        .modal-footer { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 10px; border-top: 1px solid #eee; flex-shrink: 0; }
+
+        .btn-icon-back { display: inline-flex; align-items: center; gap: 5px; padding: 8px 16px; border-radius: 4px; border: none; background: #777; color: #fff; font-size: 12px; cursor: pointer; }
+        .btn-save { padding: 8px 24px; border-radius: 4px; border: none; background: #1a73e8; color: #ffffff; font-size: 13px; cursor: pointer; font-weight: bold; }
+        .btn-save:hover { background: #0d47a1; }
+        .btn-save:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* LIST & ROWS - DESKTOP DEFAULT */
+        .acc-list-container { margin-top: 20px; overflow-y: auto; border-top: 1px solid #eee; }
+
+        /* Updated Grid for Normal Sized Image */
+        .acc-item-row { display: grid; grid-template-columns: 250px 1fr 100px 80px; gap: 20px; padding: 20px 0; border-bottom: 1px solid #eee; align-items: center; }
+
+        /* --- NORMAL IMAGE SIZE (250px) --- */
+        .acc-item-img {
+            width: 250px;
+            height: 180px; /* Kept proportional */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            object-fit: contain;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 10px;
+        }
+
+        .acc-item-desc { font-size: 15px; color: #333; font-weight: bold; }
+        .acc-item-sub { font-weight: normal; font-size: 13px; color: #666; display: block; margin-top: 5px; }
+        .acc-item-price { font-size: 14px; font-weight: bold; color: #1a73e8; text-align: right; }
+        .acc-add-btn { background: #1a73e8; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; cursor: pointer; width: 100%; }
+        .acc-add-btn.added { background: #2e7d32; cursor: default; }
+
+        .size-edit-wrapper { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+        .size-input { width: 65px; padding: 4px; font-size: 12px; border: 1px solid #999; border-radius: 3px; }
+        .btn-edit-size { background: #e3f2fd; border: 1px solid #bbdefb; color: #1976d2; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold; }
+
+        /* SELECTED ITEMS */
+        .selected-wrapper { margin-top: 30px; display: none; }
+        .selected-title { font-size: 15px; margin-bottom: 10px; font-weight: bold; }
+        .selected-list { display: flex; flex-direction: column; gap: 12px; }
+        .selected-card { width: 100%; border-radius: 6px; border: 1px solid #e0e0e0; padding: 12px 16px; background: #fafafa; box-shadow: 0 1px 2px rgba(0,0,0,0.05); font-size: 13px; position: relative; display: grid; grid-template-columns: 1.5fr 2fr 1fr auto; align-items: center; gap: 15px; }
+        .selected-card-title { font-weight: bold; color: #1a73e8; font-size: 13px; }
+        .selected-card-details { color: #555; font-size: 12px; line-height: 1.4; }
+        .selected-card-price { font-weight: bold; font-size: 13px; text-align: right; }
+        .remove-card-btn { background: transparent; border: none; color: #999; font-size: 20px; font-weight: bold; cursor: pointer; line-height: 1; padding: 0 0 0 10px; }
+        .remove-card-btn:hover { color: #d32f2f; }
+
+        /* Spec Body Grid Updated for Normal Image */
+        .spec-body { display: grid; grid-template-columns: 300px 1fr; gap: 25px; margin-top: 15px; }
+
+        /* --- NORMAL SPEC IMAGE --- */
+        .spec-image-box {
+            width: 100%;
+            height: 240px;
+            border-radius: 6px;
+            border: 1px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #f9f9f9;
+        }
+
+        .spec-image-box img { width: 100%; height: 100%; object-fit: contain; }
+        .spec-meta { font-size: 13px; margin-bottom: 4px; }
+        .spec-meta span { font-weight: bold; }
+
+        .summary-bar { margin-top: 20px; padding-top: 10px; border-top: 1px dashed #ddd; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .summary-total { font-weight: bold; }
+        .summary-actions { display: flex; gap: 10px; }
+
+        #enquiryModal .modal-card { width: 500px; }
+
+        /* ========================================================= */
+        /* MOBILE & TABLET OPTIMIZATION (MEDIA QUERIES)              */
+        /* ========================================================= */
+        @media (max-width: 768px) {
+            .top-bar-wrapper { padding: 10px; }
+            .top-bar { height: auto; flex-direction: column; padding: 15px; gap: 10px; }
+            .nav-links { display: none; }
+
+            .main-container { padding: 20px 10px; }
+            .card { width: 100%; padding: 20px 15px; }
+
+            .button-group { justify-content: center; }
+            .btn-option { width: 48%; text-align: center; padding: 10px 5px; }
+
+            .modal-card { width: 95%; padding: 15px; height: 90vh; }
+
+            .acc-item-row {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding: 20px 0;
+                border-bottom: 2px solid #f0f0f0;
+            }
+
+            /* Responsive Image for Mobile */
+            .acc-item-img {
+                width: 100%;
+                max-width: 300px; /* Prevent it from being huge on mobile */
+                height: auto;
+                aspect-ratio: 4/3;
+                margin-bottom: 10px;
+            }
+
+            .acc-item-desc { font-size: 16px; margin-bottom: 5px; }
+            .acc-item-price { text-align: center; margin: 10px 0; font-size: 16px; }
+            .acc-add-btn { width: 100%; padding: 10px; font-size: 14px; }
+            .size-edit-wrapper { justify-content: center; }
+
+            .selected-card {
+                grid-template-columns: 1fr auto;
+                grid-template-areas: "title remove" "details details" "price price";
+                gap: 5px;
+            }
+            .selected-card-title { grid-area: title; }
+            .remove-card-btn { grid-area: remove; }
+            .selected-card-details { grid-area: details; }
+            .selected-card-price { grid-area: price; text-align: left; margin-top: 5px; color: #1a73e8; }
+
+            .spec-body { grid-template-columns: 1fr; }
+
+            /* Responsive Spec Image for Mobile */
+            .spec-image-box {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 4/3;
+            }
+
+            .summary-bar { flex-direction: column; gap: 15px; text-align: center; }
+            .summary-actions { flex-direction: column; width: 100%; }
+            .btn-next, .btn-back { width: 100%; margin: 5px 0; box-sizing: border-box; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-overlay">
+    <div class="top-bar-wrapper">
+        <div class="top-bar">
+            <img class="logo-img" src="https://hollyblueinterio.com/images/abc/logo.png" alt="HollyBlue">
+            <div class="nav-links">
+               <a href="/">Home</a>
+                <a href="https://hollyblueinterio.com/about.html">Our Company</a>
+                <a href="https://hollyblueinterio.com/team.html">Our Team</a>
+                <a href="https://hollyblueinterio.com/services.html">Our Services</a>
+                <a href="https://hollyblueinterio.com/works.html">Our Works</a>
+                <a href="https://hollyblueinterio.com/contact.html">Contact Us</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="card">
+            <div class="page-title">LET'S GET STARTED</div>
+            <div class="page-step">SELECT YOUR MODULES</div>
+            <div class="section">
+                <div class="section-title">Choose your units</div>
+                <div class="button-group">
+                    <button id="btn-kitchen" class="btn-option" onclick="openSpecModal()">Kitchen</button>
+                    <button id="btn-accessories" class="btn-option" onclick="openAccessoryModal()">Kitchen Accessories</button>
+                    <button id="btn-tv" class="btn-option" onclick="openUniversalModal('TV Unit')">TV Unit</button>
+                    <button id="btn-washing" class="btn-option" onclick="openUniversalModal('Washing Unit')">Washing Unit</button>
+                    <button id="btn-mirror" class="btn-option" onclick="openUniversalModal('Mirror')">Mirror</button>
+                    <button id="btn-partition" class="btn-option" onclick="openUniversalModal('Partition')">Partition</button>
+                    <button id="btn-breakfast" class="btn-option" onclick="openUniversalModal('Break Fast Table')">Break Fast Table</button>
+                    <button id="btn-bedcot" class="btn-option" onclick="openUniversalModal('BedCOT')">Bedcot</button>
+                    <button id="btn-headboard" class="btn-option" onclick="openUniversalModal('Head Board')">Head Board</button>
+                    <button id="btn-wallpanel" class="btn-option" onclick="openUniversalModal('Wall Panel')">Wall Panel</button>
+                    <button id="btn-texture" class="btn-option" onclick="openUniversalModal('Texture Paint')">Texture Paint</button>
+                    <button id="btn-side" class="btn-option" onclick="openUniversalModal('Side Table')">Side Table</button>
+                    <button id="btn-wardrobe" class="btn-option" onclick="openUniversalModal('Wardrobe')">WardRob</button>
+                    <button id="btn-dressing" class="btn-option" onclick="openUniversalModal('Dressing')">Dressing</button>
+                    <button id="btn-vanity" class="btn-option" onclick="openUniversalModal('Vanity')">Vanity</button>
+                </div>
+            </div>
+
+            <div class="selected-wrapper" id="selectedWrapper">
+                <div class="selected-title">Selected items</div>
+                <div id="selectedList" class="selected-list"></div>
+                <div id="summaryBar" class="summary-bar" style="display:none;">
+                    <div class="summary-total">Total Amount: <span id="totalAmount">₹ 0.00</span></div>
+                    <div class="summary-actions">
+                        <a href="/" class="btn-back">← Back to Home</a>
+                        <button type="button" class="btn-next" onclick="openEnquiryModal()">Submit Enquiry</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="specModal">
+    <div class="modal-card">
+        <button class="modal-close" onclick="closeSpecModal()">×</button>
+        <div class="modal-header"><div class="modal-title" id="specTitle">Kitchen Specification</div></div>
+        <div class="modal-section"><label class="modal-label">Kitchen Shape</label><select id="kitchenShape" class="modal-select" onchange="updateKitchenList()"><option>STRAIGHT KITCHEN</option><option>L SHAPE KITCHEN</option><option>U SHAPE KITCHEN</option></select></div>
+        <div class="modal-section"><label class="modal-label">Unit Filter</label><select id="unitFilter" class="modal-select" onchange="updateKitchenList()"><option value="Both">Both (Bottom & Wall)</option><option value="BOTTOM UNIT">Bottom Unit Only</option><option value="WALL UNIT">Wall Unit Only</option></select></div>
+        <div class="modal-section"><label class="modal-label">Material</label><select id="materialType" class="modal-select" onchange="updateKitchenList()"><option>PLY WITH LAM</option><option>PLY WITH ACRYLIC</option><option>PLY WITH VENEER</option><option>WPC WITH LAM</option></select></div>
+        <div class="modal-section"><div style="background:#f9f9f9; padding:10px; border:1px dashed #ccc; font-size:12px; color:#444;"><strong>Specification:</strong><br><span id="kitchenSpecText"></span></div></div>
+        <div id="kitchenListContainer" class="acc-list-container"></div>
+        <div class="modal-footer"><button class="btn-icon-back" onclick="closeSpecModal()">← Close</button></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="accModal">
+    <div class="modal-card">
+        <button class="modal-close" onclick="closeAccModal()">×</button>
+        <div class="modal-header"><div class="modal-title">Kitchen Accessories</div></div>
+        <div class="modal-section"><label class="modal-label">Category</label><input type="text" class="modal-input modal-input-fixed" value="Kitchen Accessories" readonly></div>
+        <div class="modal-section"><label class="modal-label">Unit Type</label><select id="accUnitType" class="modal-select" onchange="updateAccDetails()"><option>BOTTOM UNIT</option><option>WALL UNIT</option></select></div>
+        <div class="modal-section"><label class="modal-label">Material</label><select id="accMaterialType" class="modal-select" onchange="updateAccDetails()"><option>PLY WITH LAM</option><option>PLY WITH ACRYLIC</option><option>PLY WITH VENEER</option><option>WPC WITH LAM</option></select></div>
+        <div id="accListContainer" class="acc-list-container"></div>
+        <div class="modal-footer"><button class="btn-icon-back" onclick="closeAccModal()">← Close</button></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="universalModal">
+    <div class="modal-card">
+        <button class="modal-close" onclick="closeUniversalModal()">×</button>
+        <div class="modal-header"><div class="modal-title" id="univTitle">Unit Specification</div></div>
+        <div class="modal-section"><label class="modal-label">Category</label><input type="text" id="univCategory" class="modal-input modal-input-fixed" readonly></div>
+        <div class="modal-section" id="univTypeWrapper" style="display:none;"><label class="modal-label">Type</label><select id="univSubType" class="modal-select" onchange="updateUniversalDetails()"></select></div>
+        <div class="modal-section"><label class="modal-label">Material</label><select id="univMaterial" class="modal-select" onchange="updateUniversalDetails()"><option>PLY WITH LAM</option><option>PLY WITH ACRYLIC</option><option>PLY WITH VENEER</option><option>WPC WITH LAM</option></select></div>
+        <div class="modal-section" id="univSizeWrapper"><label class="modal-label">Size</label><select id="univSize" class="modal-select" onchange="renderUniversalSelection()"></select></div>
+
+        <div class="spec-body">
+            <div class="spec-image-box" id="univImgBox">Image</div>
+            <div>
+                <p class="spec-text" id="univSpecText"></p>
+                <p class="spec-meta"><span>Category:</span> <span id="univMetaCat"></span></p>
+                <p class="spec-meta"><span>Material:</span> <span id="univMetaMaterial"></span></p>
+                <p class="spec-meta"><span>Size:</span> <span id="univMetaSize"></span></p>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
+                    <p class="spec-meta" style="margin:0;"><span>Price:</span> <span id="univMetaPrice" style="font-size:16px; color:#1a73e8;"></span></p>
+
+                    <button class="btn-save" id="univAddBtn" onclick="addUniversalToList()">Add</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer" style="justify-content: flex-start;">
+            <button class="btn-icon-back" onclick="closeUniversalModal()">← Back</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="enquiryModal">
+    <div class="modal-card">
+        <button class="modal-close" onclick="closeEnquiryModal()">×</button>
+        <div class="modal-header"><div class="modal-title">Enquiry Form</div></div>
+        <div class="modal-section"><label class="modal-label">Name</label><input id="enqName" type="text" class="modal-input" placeholder="Enter your name"></div>
+        <div class="modal-section"><label class="modal-label">Email ID</label><input id="enqEmail" type="email" class="modal-input" placeholder="Enter your email"></div>
+        <div class="modal-section"><label class="modal-label">Mobile Number</label><input id="enqMobile" type="text" class="modal-input" placeholder="Enter your mobile"></div>
+        <div class="modal-section"><label class="modal-label">Location</label><input id="enqLocation" type="text" class="modal-input" placeholder="Enter location"></div>
+        <div class="modal-section"><label class="modal-label">Total Square Feet</label><input id="enqSqFt" type="text" class="modal-input" placeholder="e.g. 1200"></div>
+        <div class="modal-section"><label class="modal-label">Current Status</label><input id="enqStatus" type="text" class="modal-input" placeholder="e.g. New Construction"></div>
+
+        <div class="modal-section">
+            <label class="modal-label">Best Time to Call</label>
+            <select id="enqCallTime" class="modal-select"><option value="Morning">Morning</option><option value="Afternoon">Afternoon</option><option value="Evening">Evening</option></select>
+        </div>
+
+        <div class="modal-footer" style="justify-content: flex-end;"><button type="button" class="btn-save" onclick="submitEnquiry()">Confirm</button></div>
+    </div>
+</div>
+
+<script>
+    // === 1. SAFE DATA LOADING ===
+    let dbKitchenItems = [], dbModules = [], dbAccessories = [];
+    try {
+        dbKitchenItems = JSON.parse('{{ kitchen_items_json|escapejs|default:"[]" }}');
+        dbModules = JSON.parse('{{ modules_json|escapejs|default:"[]" }}');
+        dbAccessories = JSON.parse('{{ accessories_json|escapejs|default:"[]" }}');
+    } catch (e) {
+        console.error("Data loading error:", e);
+    }
+
+    // Global Vars
+    let cart = [];
+    let currentItems = [];
+    let universalItemsCache = [];
+
+    // Helper: Format Price
+    function formatPrice(num) {
+        return "₹ " + parseFloat(num).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Helper: Calculation
+    function processItemForDisplay(item) {
+        const len = parseFloat(item.length) || 0;
+        const height = parseFloat(item.height) || 0;
+        const price = parseFloat(item.price) || 0;
+        let rate = 0;
+        if (len > 0 && height > 0) {
+            const sqFt = (len * height) / 92903.04;
+            rate = price / sqFt;
+        }
+        return {
+            ...item,
+            currentLen: len,
+            currentHeight: height,
+            currentPrice: price,
+            rate: rate,
+            displaySize: `${len}mm x ${item.depth}mm x ${height}mm`
+        };
+    }
+
+    // === 2. BUTTON STATE MANAGEMENT ===
+    const categoryButtonMap = {
+        "Kitchen": "btn-kitchen", "Kitchen Accessories": "btn-accessories", "TV Unit": "btn-tv",
+        "Washing Unit": "btn-washing", "Mirror": "btn-mirror", "Partition": "btn-partition",
+        "Break Fast Table": "btn-breakfast", "BedCOT": "btn-bedcot", "Head Board": "btn-headboard",
+        "Wall Panel": "btn-wallpanel", "Texture Paint": "btn-texture", "Side Table": "btn-side",
+        "Wardrobe": "btn-wardrobe", "Dressing": "btn-dressing", "Vanity": "btn-vanity"
+    };
+
+    function updateMainButtonStates() {
+        Object.values(categoryButtonMap).forEach(btnId => {
+            const btn = document.getElementById(btnId);
+            if(btn) btn.classList.remove("completed");
+        });
+        const activeCategories = [...new Set(cart.map(item => item.category))];
+        activeCategories.forEach(cat => {
+            const btnId = categoryButtonMap[cat];
+            if(btnId) document.getElementById(btnId).classList.add("completed");
+        });
+    }
+
+    // === 3. KITCHEN LOGIC ===
+    function openSpecModal() {
+        document.getElementById("kitchenShape").value="STRAIGHT KITCHEN";
+        document.getElementById("materialType").value="PLY WITH LAM";
+        updateKitchenList();
+        document.getElementById("specModal").classList.add("show");
+    }
+    function closeSpecModal() { document.getElementById("specModal").classList.remove("show"); }
+
+    function updateKitchenList() {
+        const shape = document.getElementById('kitchenShape').value;
+        const mat = document.getElementById('materialType').value;
+        const filter = document.getElementById('unitFilter').value;
+        const container = document.getElementById("kitchenListContainer");
+        container.innerHTML = "";
+        currentItems = [];
+
+        let filtered = dbKitchenItems.filter(item => item.kitchen_shape === shape && item.material === mat);
+        if(filter !== "Both") filtered = filtered.filter(item => item.unit_type === filter);
+
+        if(filtered.length > 0 && document.getElementById("kitchenSpecText")) {
+            document.getElementById("kitchenSpecText").innerText = filtered[0].specification || "Standard Spec";
+        }
+
+        filtered.forEach((rawItem, index) => {
+            const item = processItemForDisplay(rawItem);
+            currentItems.push(item);
+            const imgHtml = item.image ? `<img src="/media/${item.image}" class="acc-item-img">` : `<div class="spec-image-box" style="width:180px;height:135px;">Img</div>`;
+
+            const isInCart = cart.some(c => c.title === item.name && c.category === "Kitchen");
+            const btnClass = isInCart ? "acc-add-btn added" : "acc-add-btn";
+            const btnText = isInCart ? "Added ✔" : "Add";
+            const btnDisabled = isInCart ? "disabled" : "";
+
+            const div = document.createElement("div"); div.className="acc-item-row";
+            div.innerHTML = `
+                ${imgHtml}
+                <div>
+                    <div class="acc-item-desc">${item.name} (${item.kitchen_shape})</div>
+                    <div class="size-edit-wrapper" id="size-wrap-${index}">
+                        <span class="acc-item-sub" id="size-txt-${index}">${item.displaySize}</span>
+                        <button class="btn-edit-size" onclick="editSize(${index})">Edit</button>
+                    </div>
+                </div>
+                <div class="acc-item-price" id="price-txt-${index}">${formatPrice(item.currentPrice)}</div>
+                <div style="text-align:right;"><button type="button" class="${btnClass}" ${btnDisabled} onclick="addItemToCart(this, ${index}, 'Kitchen')">${btnText}</button></div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // === 4. UNIVERSAL MODULE LOGIC (FIXED) ===
+    function openUniversalModal(category) {
+        document.getElementById("univCategory").value = category;
+        document.getElementById("univMaterial").value = "PLY WITH LAM";
+
+        // CLEAR PREVIOUS DATA (Ghost Data Fix)
+        document.getElementById("univSpecText").innerText = "";
+        document.getElementById("univMetaCat").innerText = "";
+        document.getElementById("univMetaMaterial").innerText = "";
+        document.getElementById("univMetaSize").innerText = "";
+        document.getElementById("univImgBox").innerHTML = "Loading...";
+        document.getElementById("univMetaPrice").innerText = "";
+
+        updateUniversalDetails();
+        document.getElementById("universalModal").classList.add("show");
+    }
+    function closeUniversalModal() { document.getElementById("universalModal").classList.remove("show"); }
+
+    function updateUniversalDetails() {
+        const cat = document.getElementById("univCategory").value;
+        const mat = document.getElementById("univMaterial").value;
+
+        let items = dbModules.filter(i => i.category === cat && (i.material || "").toUpperCase() === mat.toUpperCase());
+
+        const subTypeDiv = document.getElementById("univTypeWrapper");
+        const subTypeSel = document.getElementById("univSubType");
+        const uniqueSubtypes = [...new Set(items.map(i => i.sub_type).filter(Boolean))];
+
+        if(uniqueSubtypes.length > 0) {
+            subTypeDiv.style.display = "block";
+            const currentSub = subTypeSel.value;
+            subTypeSel.innerHTML = "";
+            uniqueSubtypes.forEach(st => {
+                const opt = document.createElement("option"); opt.value = st; opt.text = st;
+                if(st === currentSub) opt.selected = true;
+                subTypeSel.appendChild(opt);
+            });
+            if(subTypeSel.value) items = items.filter(i => i.sub_type === subTypeSel.value);
+        } else {
+            subTypeDiv.style.display = "none";
+        }
+
+        universalItemsCache = items;
+        const sizeSel = document.getElementById("univSize");
+        const currentSizeId = sizeSel.value;
+        sizeSel.innerHTML = "";
+
+        if(items.length > 0) {
+            items.forEach(i => {
+                const opt = document.createElement("option"); opt.value = i.id; opt.text = `${i.length}mm x ${i.height}mm`;
+                if(i.id.toString() === currentSizeId) opt.selected = true;
+                sizeSel.appendChild(opt);
+            });
+        } else {
+            sizeSel.innerHTML = "<option>No items found</option>";
+        }
+
+        renderUniversalSelection();
+    }
+
+    function renderUniversalSelection() {
+        const sizeSel = document.getElementById("univSize");
+        const selectedId = sizeSel.value;
+        const selectedItem = universalItemsCache.find(i => i.id.toString() === selectedId);
+        const addBtn = document.getElementById("univAddBtn");
+
+        if(selectedItem) {
+            document.getElementById("univSpecText").innerText = selectedItem.specification || "";
+            document.getElementById("univMetaPrice").innerText = formatPrice(selectedItem.price);
+            document.getElementById("univMetaSize").innerText = `${selectedItem.length}x${selectedItem.height}`;
+            document.getElementById("univMetaCat").innerText = selectedItem.category;
+            document.getElementById("univMetaMaterial").innerText = selectedItem.material;
+            const imgBox = document.getElementById("univImgBox");
+            if (selectedItem.image) {
+                 const imgSrc = selectedItem.image.startsWith('/media/') ? selectedItem.image : '/media/' + selectedItem.image;
+                 imgBox.innerHTML = `<img src="${imgSrc}" alt="${selectedItem.category}">`;
+            } else {
+                 imgBox.innerHTML = 'Image / 3D View';
+            }
+            currentItems = [ processItemForDisplay(selectedItem) ];
+
+            const isInCart = cart.some(c => c.size === `${selectedItem.length}mm x ${selectedItem.depth}mm x ${selectedItem.height}mm` && c.category === selectedItem.category);
+            addBtn.innerText = isInCart ? "Added" : "Add";
+            addBtn.disabled = isInCart;
+            addBtn.style.background = isInCart ? "#2e7d32" : "#1a73e8";
+
+        } else {
+            // FIX: CLEAR DATA IF NO ITEM FOUND
+            document.getElementById("univMetaPrice").innerText = "Unavailable";
+            document.getElementById("univSpecText").innerText = "";
+            document.getElementById("univMetaCat").innerText = "";
+            document.getElementById("univMetaMaterial").innerText = "";
+            document.getElementById("univMetaSize").innerText = "";
+            document.getElementById("univImgBox").innerHTML = "No Item Found";
+            currentItems = [];
+            addBtn.disabled = true;
+            addBtn.style.background = "#ccc";
+        }
+    }
+
+    function addUniversalToList() {
+        if(currentItems.length > 0) {
+            const cat = document.getElementById("univCategory").value;
+            addItemToCart(null, 0, cat);
+            closeUniversalModal();
+        }
+    }
+
+    // === 5. EDIT SIZES ===
+    function editSize(index) {
+        const item = currentItems[index];
+        const wrap = document.getElementById(`size-wrap-${index}`);
+        wrap.innerHTML = `L: <input type="number" class="size-input" id="inp-len-${index}" value="${item.currentLen}" onchange="recalc(${index})"> H: <input type="number" class="size-input" id="inp-height-${index}" value="${item.currentHeight}" onchange="recalc(${index})"><button class="btn-edit-size" onclick="recalc(${index})">Set</button>`;
+    }
+    function recalc(index) {
+        const item = currentItems[index];
+        const lInp = document.getElementById(`inp-len-${index}`);
+        const hInp = document.getElementById(`inp-height-${index}`);
+        if(lInp && hInp) {
+            item.currentLen = parseFloat(lInp.value) || item.currentLen;
+            item.currentHeight = parseFloat(hInp.value) || item.currentHeight;
+            if(item.rate > 0) {
+                const newSqFt = (item.currentLen * item.currentHeight) / 92903.04;
+                item.currentPrice = Math.round(newSqFt * item.rate);
+            }
+            document.getElementById(`size-wrap-${index}`).innerHTML = `<span class="acc-item-sub" id="size-txt-${index}">${item.currentLen}mm x ${item.depth}mm x ${item.currentHeight}mm</span><button class="btn-edit-size" onclick="editSize(${index})">Edit</button>`;
+            document.getElementById(`price-txt-${index}`).innerText = formatPrice(item.currentPrice);
+        }
+    }
+
+    // === 6. CART LOGIC ===
+    function addItemToCart(btn, index, typeLabel) {
+        const item = currentItems[index];
+        const categoryName = typeLabel || item.category || "General";
+
+        cart.push({
+            title: item.name || item.category,
+            category: categoryName,
+            shape: item.kitchen_shape || item.sub_type || "Standard",
+            material: item.material,
+            size: `${item.currentLen}mm x ${item.depth}mm x ${item.currentHeight}mm`,
+            price: item.currentPrice
+        });
+        renderCart();
+        if(btn) { btn.innerText = "Added ✔"; btn.classList.add("added"); btn.disabled = true; }
+        updateMainButtonStates();
+    }
+
+    // === 7. ACCESSORIES LOGIC ===
+    function openAccessoryModal() {
+        document.getElementById("accModal").classList.add("show");
+        updateAccDetails();
+    }
+    function closeAccModal() { document.getElementById("accModal").classList.remove("show"); }
+
+    function updateAccDetails() {
+        const unitRaw = document.getElementById("accUnitType").value;
+        const matRaw = document.getElementById("accMaterialType").value;
+        const container = document.getElementById("accListContainer");
+        container.innerHTML = "";
+
+        const items = dbAccessories.filter(i => {
+            const dbUnit = (i.unit_type || "").toUpperCase();
+            const dbMat = (i.material || "").toUpperCase();
+            return dbUnit === unitRaw.toUpperCase() && dbMat === matRaw.toUpperCase();
+        });
+
+        if (items.length === 0) { container.innerHTML = '<div style="padding:15px; text-align:center; color:#777;">No accessories found.</div>'; return; }
+
+        items.forEach((item) => {
+             const row = document.createElement("div"); row.className = "acc-item-row";
+             const imgHtml = item.image ? `<img src="/media/${item.image}" class="acc-item-img">` : `<div class="spec-image-box" style="width:120px;height:90px;">No Img</div>`;
+             let sizeStr = "-";
+             if(item.length && item.depth && item.height) { sizeStr = `${item.length}mm x ${item.depth}mm x ${item.height}mm`; }
+
+             const isInCart = cart.some(c => c.title === item.name && c.category === "Kitchen Accessories");
+             const btnClass = isInCart ? "acc-add-btn added" : "acc-add-btn";
+             const btnText = isInCart ? "Added" : "Add";
+             const btnDisabled = isInCart ? "disabled" : "";
+
+             row.innerHTML = `
+                ${imgHtml}
+                <div>
+                    <div class="acc-item-desc">${item.name}</div>
+                    <div style="font-size:11px; color:#555;">Size: ${sizeStr}</div>
+                </div>
+                <div class="acc-item-price">${formatPrice(item.price)}</div>
+                <div style="text-align:right;">
+                    <button type="button" class="${btnClass}" ${btnDisabled} onclick="addAccessoryToCart(this, '${item.name}', ${item.price}, '${item.material}', '${sizeStr}')">${btnText}</button>
+                </div>`;
+             container.appendChild(row);
+        });
+    }
+
+    function addAccessoryToCart(btn, name, price, mat, sizeStr) {
+        cart.push({ title: name, category: "Kitchen Accessories", shape: "Standard", material: mat, size: sizeStr, price: parseFloat(price) });
+        renderCart();
+        btn.innerText = "Added"; btn.classList.add("added"); btn.disabled = true;
+        highlightMainButton("Kitchen Accessories");
+    }
+
+    // === 8. REMOVE & RENDER ===
+    function removeItem(index) {
+        cart.splice(index, 1);
+        renderCart();
+    }
+
+    function renderCart() {
+        const wrapper = document.getElementById("selectedWrapper");
+        const listDiv = document.getElementById("selectedList");
+        const totalSpan = document.getElementById("totalAmount");
+
+        if(cart.length > 0) {
+            wrapper.style.display = "block";
+        } else {
+            wrapper.style.display = "none";
+        }
+
+        listDiv.innerHTML = "";
+        let total = 0;
+
+        cart.forEach((item, index) => {
+            total += item.price;
+            const card = document.createElement("div"); card.className = "selected-card";
+            card.innerHTML = `
+                <div class="selected-card-title">${item.title}</div>
+                <div class="selected-card-details"><strong>Cat:</strong> ${item.category} | <strong>Type:</strong> ${item.shape} <br><strong>Mat:</strong> ${item.material} | <strong>Size:</strong> ${item.size}</div>
+                <div class="selected-card-price">${formatPrice(item.price)}</div>
+                <button type="button" class="remove-card-btn" onclick="removeItem(${index})">×</button>`;
+            listDiv.appendChild(card);
+        });
+        document.getElementById("summaryBar").style.display = "flex";
+        totalSpan.innerText = formatPrice(total);
+
+        updateMainButtonStates();
+    }
+
+    // === 9. SUBMIT ENQUIRY ===
+    function openEnquiryModal() {
+        if (cart.length === 0) {
+            alert("Please add at least one item to the cart first.");
+            return;
+        }
+        document.getElementById("enquiryModal").classList.add("show");
+    }
+
+    function closeEnquiryModal() {
+        document.getElementById("enquiryModal").classList.remove("show");
+    }
+
+    function submitEnquiry() {
+        const n = document.getElementById("enqName").value;
+        const m = document.getElementById("enqMobile").value;
+        const total = document.getElementById("totalAmount").innerText;
+        // Capture new field
+        const callTime = document.getElementById("enqCallTime").value;
+
+        if(!n || !m) { alert("Name and Mobile are required."); return; }
+
+        const formData = {
+            name: n, email: document.getElementById("enqEmail").value, mobile: m,
+            location: document.getElementById("enqLocation").value,
+            sqft: document.getElementById("enqSqFt").value,
+            status: document.getElementById("enqStatus").value,
+            call_time: callTime,  // SEND THIS TO BACKEND
+            total_amount: total,
+            details: cart
+        };
+
+        const btn = document.querySelector("#enquiryModal .btn-save");
+        btn.innerText = "Sending..."; btn.disabled = true;
+
+        fetch('/api/submit-enquiry/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === 'success') {
+                alert("Enquiry submitted successfully!");
+                closeEnquiryModal();
+                cart = [];
+                renderCart();
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .finally(() => { btn.innerText = "Confirm"; btn.disabled = false; });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+node_modules/
+.env
+.DS_Store
+/test/
+/tests/
+*.log
+*.test.js
+*.spec.js
+secret.js
+config.js

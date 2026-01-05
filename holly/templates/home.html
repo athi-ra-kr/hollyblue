@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hollyblue interior</title>
+    <description>Get work Estimate v5.0</description>
+    <style>
+        /* Reset */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+
+        /* ==== PAGE BACKGROUND ==== */
+        body {
+            background-image: url("https://images.unsplash.com/photo-1618219908412-a29a1bb7b86e?q=80&w=2000&auto=format&fit=crop");
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .page-overlay { background: rgba(0, 0, 0, 0.5); min-height: 100vh; }
+
+        /* ==== TOP BAR ==== */
+        .top-bar-wrapper { padding: 16px 40px 0; }
+        .top-bar {
+            height: 70px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px; background-color: #ffffff; border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .logo { display: flex; align-items: center; }
+        .logo-img { height: 40px; width: auto; }
+
+        /* UPDATED LINKS STYLING */
+        .nav-links { display: flex; gap: 20px; font-size: 13px; }
+        .nav-links a { color: #333; text-decoration: none; font-weight: 500; transition: 0.2s; }
+        .nav-links a:hover { color: #1a73e8; text-decoration: underline; }
+
+        /* ==== CARD ==== */
+        .main-container {
+            width: 100%; min-height: calc(100vh - 90px); display: flex;
+            justify-content: center; align-items: flex-start; padding: 60px 0 60px;
+        }
+        .card {
+            width: 70%; max-width: 900px; background-color: #ffffff;
+            border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+            display: flex; flex-direction: row; overflow: hidden;
+        }
+        .card-left, .card-right { padding: 40px 50px; }
+        .card-left { width: 50%; border-right: 1px solid #f0f0f0; }
+        .card-right { width: 50%; display: flex; flex-direction: column; justify-content: center; }
+
+        .page-title { text-align: center; margin-bottom: 5px; font-size: 22px; letter-spacing: 0.5px; }
+        .page-step { text-align: center; font-size: 12px; color: #999999; margin-bottom: 30px; }
+        .section-title { font-size: 16px; margin-bottom: 12px; }
+        .button-group { display: flex; gap: 12px; margin-bottom: 68px; flex-wrap: wrap; }
+
+        .btn-option {
+            border: 1px solid #1a73e8; padding: 10px 24px; border-radius: 4px;
+            font-size: 10px; color: #1a73e8; background-color: #fff;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .btn-option:hover, .btn-option.active { background-color: #1a73e8; color: #ffffff; }
+
+        .illustration-box {
+            width: 100%; height: 250px; border-radius: 4px; border: 1px dashed #c0c0c0;
+            display: flex; align-items: center; justify-content: center; margin-bottom: 30px;
+            background-color: #fafafa; overflow: hidden; position: relative;
+        }
+        .illustration-img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+        .right-title { text-align: center; font-size: 16px; margin-bottom: 10px; }
+        .right-subtitle { text-align: center; font-size: 13px; color: #777777; margin-bottom: 10px; }
+        .right-text { font-size: 12px; color: #777777; line-height: 1.6; text-align: center; }
+
+        .btn-next {
+            display: block; width: 120px; text-align: center; background-color: #1a73e8;
+            color: #fff !important; padding: 10px 30px; border-radius: 4px; font-size: 12px;
+            text-decoration: none; margin: 20px auto 0; cursor: pointer; transition: 0.3s;
+        }
+        .btn-next:hover { background-color: #0d47a1; }
+
+        .admin-link { position: fixed; bottom: 10px; right: 10px; color: rgba(255,255,255,0.3); font-size: 10px; text-decoration: none; }
+
+        /* MOBILE OPTIMIZATION */
+        @media (max-width: 900px) {
+            .top-bar-wrapper { padding: 10px; }
+            .top-bar { height: auto; padding: 15px; }
+            /* Hide Nav Links on Mobile to save space, or stack them if preferred */
+            .nav-links { display: none; }
+
+            .main-container { padding: 20px 10px; }
+            .card { flex-direction: column; width: 100%; }
+            .card-left, .card-right { width: 100%; border-right: none; border-bottom: 1px solid #f0f0f0; padding: 30px 20px; }
+            .card-right { order: 2; } .card-left { order: 1; }
+            .button-group { justify-content: center; margin-bottom: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-overlay">
+
+    <div class="top-bar-wrapper">
+        <div class="top-bar">
+            <div class="logo">
+                <img class="logo-img" src="https://hollyblueinterio.com/images/abc/logo.png" alt="HollyBlue">
+            </div>
+
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="https://hollyblueinterio.com/about.html">Our Company</a>
+                <a href="https://hollyblueinterio.com/team.html">Our Team</a>
+                <a href="https://hollyblueinterio.com/services.html">Our Services</a>
+                <a href="https://hollyblueinterio.com/works.html">Our Works</a>
+                <a href="https://hollyblueinterio.com/contact.html">Contact Us</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="card">
+            <div class="card-left">
+                <div class="page-title">LET'S GET STARTED</div>
+                <div class="page-step">DESIGN DETAILS</div>
+
+                <div class="section">
+                    <div class="section-title">Your floorplan</div>
+                    <div class="button-group">
+                        {% for plan in plans %}
+                            <button class="btn-option" onclick="changeImage('{{ plan.image.url }}', this)">{{ plan.name }}</button>
+                        {% empty %}
+                            <p style="color:#999; font-size:12px; width:100%; text-align:center;">No plans added yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+               <a href="/step2/" class="btn-next">NEXT</a>
+            </div>
+
+            <div class="card-right">
+                <div class="illustration-box" id="imageContainer">
+                    {% if plans %}
+                        <img id="previewImage" class="illustration-img" src="{{ plans.0.image.url }}" alt="Floor Plan Preview">
+                    {% else %}
+                        <img id="previewImage" class="illustration-img" src="https://via.placeholder.com/600x400?text=No+Floor+Plans" alt="Placeholder">
+                    {% endif %}
+                </div>
+
+                <div class="right-title">Your Ideas. Our Expertise.</div>
+                <div class="right-subtitle">Our 600+ design experts use state-of-the-art 3D design technology.</div>
+                <div class="right-text">
+                    SpaceCraft ensures that you get the perfect designs for your home.
+                    Start your home interiors journey with us and bring your dream home to life without the wait.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="/custom-admin-login/" class="admin-link">Admin</a>
+
+</div>
+
+<script>
+    function changeImage(imageUrl, btnElement) {
+        const imgElement = document.getElementById('previewImage');
+        if (imageUrl) imgElement.src = imageUrl;
+        const allButtons = document.querySelectorAll('.btn-option');
+        allButtons.forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+    }
+</script>
+
+</body>
+</html>

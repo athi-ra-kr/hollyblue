@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice #{{ enq.id }}</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; color: #333; }
+
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 2px solid #1a73e8; padding-bottom: 20px; }
+
+        /* --- UPDATED LOGO SIZE --- */
+        .logo-section img {
+            height: 80px;  /* Normal invoice size */
+            width: auto;
+            object-fit: contain;
+        }
+
+        .company-details { text-align: right; font-size: 12px; color: #555; line-height: 1.5; }
+        .title { color: #1a73e8; font-size: 24px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+
+        .client-info { margin-bottom: 40px; }
+        .info-row { display: flex; margin-bottom: 8px; }
+        .info-label { width: 120px; font-weight: bold; color: #444; }
+        .info-val { flex: 1; color: #000; }
+
+        /* TABLE STYLES */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+
+        /* HEADINGS STYLE */
+        thead { background-color: #f1f3f4; border-bottom: 2px solid #ccc; }
+        th { text-align: left; padding: 12px; font-size: 12px; text-transform: uppercase; color: #444; font-weight: 800; }
+
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; vertical-align: middle; }
+        .col-price { text-align: right; font-weight: bold; color: #1a73e8; }
+        .col-size { font-size: 11px; color: #666; }
+
+        .total-section { text-align: right; padding-top: 10px; border-top: 2px solid #333; }
+        .grand-total { font-size: 20px; font-weight: bold; color: #333; }
+
+        .print-btn {
+            display: block; margin: 0 auto 30px; padding: 10px 20px;
+            background: #1a73e8; color: white; border: none; border-radius: 4px;
+            cursor: pointer; font-size: 14px; text-decoration: none; width: fit-content;
+        }
+        .print-btn:hover { background: #0d47a1; }
+
+        @media print {
+            .print-btn { display: none; }
+            body { padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="javascript:window.print()" class="print-btn">Download / Print PDF</a>
+
+    <div class="header">
+        <div class="logo-section">
+            <img src="https://hollyblueinterio.com/images/abc/logo.png" alt="HollyBlue Logo">
+        </div>
+        <div class="company-details">
+            <div class="title">QUOTATION</div>
+            <strong>Hollyblue Interio</strong><br>
+            4th Floor, Door NO:51/2384/88,<br>
+            LESHORE BUSINESS PARK, Aranattukara Village,<br>
+            Poothole, Thoppinmoola, Thrissur, 680004
+        </div>
+    </div>
+
+    <div class="client-info">
+        <div class="info-row">
+            <div class="info-label">Client Name:</div>
+            <div class="info-val">{{ enq.name }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Email:</div>
+            <div class="info-val">{{ enq.email }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Mobile:</div>
+            <div class="info-val">{{ enq.mobile }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Location:</div>
+            <div class="info-val">{{ enq.location }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Status:</div>
+            <div class="info-val">{{ enq.status }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Date:</div>
+            <div class="info-val">{{ enq.created_at|date:"d M Y" }}</div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 35%;">Type / Item</th>
+                <th style="width: 25%;">Material</th>
+                <th style="width: 25%;">Size (LxDxH)</th>
+                <th style="width: 15%; text-align: right;">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td>
+                    <strong style="color:#1a73e8;">{{ item.category }}</strong><br>
+                    <span style="font-size:12px; color:#555;">{{ item.item_name }}</span>
+                </td>
+                <td>{{ item.material }}</td>
+                <td class="col-size">{{ item.size }}</td>
+                <td class="col-price">₹ {{ item.price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="total-section">
+        <div class="grand-total">Grand Total: {{ enq.total_amount }}</div>
+    </div>
+
+</body>
+</html>
