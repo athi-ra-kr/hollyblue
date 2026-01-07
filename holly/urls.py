@@ -10,7 +10,7 @@ urlpatterns =[
     path('step2/', views.step2, name='step2'),
 
                  
-    path('custom-admin-login/', views.admin_login, name='admin_login'),
+    path('admin-login/', views.admin_login, name='admin_login'),
     path('custom-admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('admin-floorplans/', views.admin_floorplans, name='admin_floorplans'),
     path('admin-kitchen/', views.admin_kitchen, name='admin_kitchen'),
