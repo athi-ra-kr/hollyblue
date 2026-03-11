@@ -1,0 +1,14 @@
+# database
+*.db
+*.sqlite3
+db.sqlite3
+
+# env
+.env
+
+# python cache
+__pycache__/
+*.pyc
+
+# node modules
+node_modules/

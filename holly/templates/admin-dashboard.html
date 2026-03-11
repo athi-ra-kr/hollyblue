@@ -1,0 +1,311 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard | Hollyblue Interior</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" type="image/x-icon" href="https://hollyblueinterio.com/images/abc/fav.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { display: flex; height: 100vh; background-color: #f4f6f9; overflow: hidden; }
+
+        /* SIDEBAR STYLE */
+        .sidebar { width: 250px; background: #ffffff; border-right: 1px solid #ddd; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; flex-shrink: 0; }
+        .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid #eee; flex-shrink: 0; }
+        .brand img { height: 35px; } .brand span { font-weight: bold; font-size: 18px; color: #333; }
+        .menu-item { padding: 12px 15px; color: #555; text-decoration: none; border-radius: 6px; margin-bottom: 5px; font-size: 13px; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
+        .menu-item i { width: 16px; text-align: center; font-size: 14px; }
+        .menu-item:hover { background-color: #e8f0fe; color: #1a73e8; }
+        .menu-item.active { background-color: #1a73e8; color: white; }
+        .menu-category { font-size: 11px; font-weight: bold; color: #999; margin-top: 15px; margin-bottom: 5px; text-transform: uppercase; padding-left: 15px; }
+        .logout { margin-top: auto; color: #1a73e8; } .logout:hover { background-color: #e8f0fe; }
+
+        /* MAIN CONTENT AREA */
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-title { font-size: 24px; font-weight: bold; color: #333; }
+
+        .user-profile-wrapper { display: flex; align-items: center; gap: 15px; }
+        .btn-add-new { background: #1a73e8; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-add-new:hover { background: #0d47a1; transform: scale(1.05); }
+
+        /* STATS CARD */
+        .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 4px solid #1a73e8; width: 250px; margin-bottom: 30px; }
+        .stat-label { font-size: 12px; color: #777; margin-bottom: 5px; text-transform: uppercase; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #333; }
+
+        /* TABLE CONTAINER & CONTROLS */
+        .table-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .table-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .search-filter-box { display: flex; gap: 10px; position: relative; align-items: center; }
+        .search-input { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; width: 180px; }
+        .date-input { padding: 7px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; color: #555; }
+        .btn-filter { padding: 8px 16px; background: #fff; border: 1px solid #1a73e8; color: #1a73e8; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+        .btn-export { padding: 8px 16px; background: #2e7d32; border: none; color: white; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+
+        .filter-dropdown { position: absolute; top: 100%; right: 100px; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 150px; display: none; z-index: 10; margin-top: 5px; }
+        .filter-dropdown.show { display: block; }
+        .filter-option { padding: 10px; cursor: pointer; font-size: 13px; color: #333; }
+        .filter-option:hover { background: #f4f6f9; color: #1a73e8; }
+
+        table { width: 100%; border-collapse: collapse; }
+        thead { border-bottom: 2px solid #333; }
+        th, td { padding: 12px 15px; text-align: left; font-size: 13px; border-bottom: 1px solid #eee; }
+        th { font-weight: 800; }
+
+        /* --- THE COLOR CHANGE FOR ADMIN ENTRIES --- */
+        tr.admin-entry { background-color: #f0f7ff !important; border-left: 4px solid #1a73e8; }
+        tr.admin-entry td { color: #1a73e8 !important; font-weight: 600 !important; }
+        .admin-badge { background: #1a73e8; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 8px; vertical-align: middle; font-weight: bold; }
+        .admin-icon { margin-right: 8px; color: #1a73e8; font-size: 14px; }
+
+        /* STATUS BADGES */
+        .status-badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; text-transform: capitalize; }
+        .status-new { background: #e3f2fd; color: #1976d2; }
+        .status-foundation { background: #e8f5e9; color: #2e7d32; }
+
+        /* ACTION BUTTONS */
+        .action-btn { border: none; background: transparent; cursor: pointer; font-size: 14px; padding: 6px; transition: 0.2s; }
+        .action-btn:hover { transform: scale(1.2); }
+
+        /* MODAL STYLE */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay.show { display: flex; }
+        .modal-card { background: white; width: 450px; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; text-align: center; }
+        .modal-title { font-size: 22px; font-weight: bold; margin-bottom: 25px; color: #333; }
+
+        .form-group { text-align: left; margin-bottom: 15px; }
+        .form-label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #666; }
+        .form-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; outline: none; }
+        .form-input:focus { border-color: #1a73e8; }
+
+        .popup-btn-container { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+        .btn-popup-next { background: #1a73e8; color: white; padding: 12px 45px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; border: none; cursor: pointer; }
+        .btn-popup-cancel { background: #f1f3f4; color: #5f6368; padding: 12px 30px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="brand"><img src="https://hollyblueinterio.com/images/abc/logo.png" alt="Logo"><span>HollyBlue</span></div>
+        <a href="/custom-admin-dashboard/" class="menu-item active"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+        <a href="/admin-floorplans/" class="menu-item"><i class="fa-solid fa-house"></i> Home</a>
+        <div class="menu-category">Modules</div>
+        <a href="/admin-kitchen/" class="menu-item"><i class="fa-solid fa-utensils"></i> Kitchen</a>
+        <a href="/admin-accessories/" class="menu-item"><i class="fa-solid fa-box-open"></i> Kitchen Accessories</a>
+        <a href="{% url 'admin_modules' 'TV Unit' %}" class="menu-item"><i class="fa-solid fa-tv"></i> TV Unit</a>
+        <a href="{% url 'admin_modules' 'Washing Unit' %}" class="menu-item"><i class="fa-solid fa-shirt"></i> Wash Unit</a>
+        <a href="{% url 'admin_modules' 'Mirror' %}" class="menu-item"><i class="fa-regular fa-square"></i> Mirror</a>
+        <a href="{% url 'admin_modules' 'Partition' %}" class="menu-item"><i class="fa-solid fa-table-columns"></i> Partition</a>
+        <a href="{% url 'admin_modules' 'Break Fast Table' %}" class="menu-item"><i class="fa-solid fa-mug-hot"></i> Breakfast Table</a>
+        <a href="{% url 'admin_modules' 'BedCOT' %}" class="menu-item"><i class="fa-solid fa-bed"></i> Bedcot</a>
+        <a href="{% url 'admin_modules' 'Head Board' %}" class="menu-item"><i class="fa-solid fa-layer-group"></i> Head Board</a>
+        <a href="{% url 'admin_modules' 'Wall Panel' %}" class="menu-item"><i class="fa-solid fa-border-all"></i> Wall Panel</a>
+        <a href="{% url 'admin_modules' 'Texture Paint' %}" class="menu-item"><i class="fa-solid fa-paint-roller"></i> Texture Paint</a>
+        <a href="{% url 'admin_modules' 'Side Table' %}" class="menu-item"><i class="fa-solid fa-cube"></i> Side Table</a>
+        <a href="{% url 'admin_modules' 'Wardrobe' %}" class="menu-item"><i class="fa-solid fa-door-closed"></i> Wardrobe</a>
+        <a href="{% url 'admin_modules' 'Dressing' %}" class="menu-item"><i class="fa-solid fa-user-tie"></i> Dressing</a>
+        <a href="{% url 'admin_modules' 'Vanity' %}" class="menu-item"><i class="fa-solid fa-bath"></i> Vanity</a>
+        <div class="menu-category">Others</div>
+        <a href="/custom-admin-login/" class="menu-item logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="page-title">Dashboard Overview</div>
+            <div class="user-profile-wrapper">
+                <div class="user-profile">Welcome, <strong>Admin</strong></div>
+                <button class="btn-add-new" onclick="openAddModal()" title="Add New Enquiry"><i class="fa-solid fa-plus"></i></button>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Total Enquiries</div>
+            <div class="stat-value">{{ total_enquiries }}</div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-controls">
+                <div style="font-weight: bold; color: #333;">Recent Enquiries</div>
+                <div class="search-filter-box">
+                    <input type="date" id="filterDate" class="date-input" onchange="masterFilter()">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search..." onkeyup="masterFilter()">
+                    <button class="btn-filter" onclick="toggleFilterMenu()"><i class="fa-solid fa-filter"></i> Status</button>
+                    <button class="btn-export" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> Export</button>
+
+                    <div id="filterDropdown" class="filter-dropdown">
+                        <div class="filter-option" onclick="setStatusFilter('all')">All</div>
+                        <div class="filter-option" onclick="setStatusFilter('foundation')">Foundation</div>
+                        <div class="filter-option" onclick="setStatusFilter('new')">New</div>
+                    </div>
+                </div>
+            </div>
+
+            <table id="enquiryTable">
+                <thead>
+                    <tr>
+                        <th>ID</th> <th>Client Name</th> <th>Number</th> <th>Location</th> <th>Date</th> <th>Total Amount</th> <th>Status</th> <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    {% for enq in enquiries %}
+                    <tr id="row-{{ enq.id }}" class="enquiry-row {% if enq.source == 'Admin' %}admin-entry{% endif %}" data-status="{{ enq.status|lower }}">
+                        <td style="font-weight:bold;">#{{ forloop.counter }}</td>
+                        <td>
+                            {% if enq.source == 'Admin' %}
+                                <i class="fa-solid fa-user-shield admin-icon"></i> {{ enq.name }} <span class="admin-badge">ADMN</span>
+                            {% else %}
+                                {{ enq.name }}
+                            {% endif %}
+                        </td>
+                        <td>{{ enq.mobile }}</td>
+                        <td>{{ enq.location }}</td>
+                        <td class="date-cell">{{ enq.created_at|date:"d M Y" }}</td>
+                        <td>{{ enq.total_amount }}</td>
+                        <td><span class="status-badge status-{{ enq.status|lower }}">{{ enq.status }}</span></td>
+                        <td>
+                            <a href="/invoice/{{ enq.id }}/" target="_blank" class="action-btn" style="color:#2e7d32;" title="Invoice"><i class="fa-solid fa-file-pdf"></i></a>
+                            <button class="action-btn" style="color:#1976d2;" title="Edit" onclick="openEditModal('{{ enq.id }}', '{{ enq.name }}', '{{ enq.mobile }}', '{{ enq.location }}', '{{ enq.total_amount }}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="action-btn" style="color:#d32f2f;" title="Delete" onclick="deleteItem('{{ enq.id }}')"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" style="text-align:center; padding: 40px; color: #999;">No Enquiries Found</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="enquiryModal">
+        <div class="modal-card">
+            <div id="addModeContent">
+                <div class="modal-title">Add New Enquiry</div>
+                <div class="popup-btn-container">
+                    <button class="btn-popup-cancel" onclick="closeModal()">Cancel</button>
+                    <a href="/step2/" class="btn-popup-next">NEXT</a>
+                </div>
+            </div>
+
+            <div id="editModeContent" style="display: none;">
+                <div class="modal-title">Edit Enquiry</div>
+                <input type="hidden" id="formId">
+                <div class="form-group"><label class="form-label">Client Name</label><input type="text" id="formName" class="form-input"></div>
+                <div class="form-group"><label class="form-label">Number</label><input type="text" id="formMobile" class="form-input"></div>
+                <div class="form-group"><label class="form-label">Location</label><input type="text" id="formLocation" class="form-input"></div>
+                <div class="form-group"><label class="form-label">Total Amount</label><input type="text" id="formAmount" class="form-input"></div>
+                <div class="popup-btn-container">
+                    <button class="btn-popup-cancel" onclick="closeModal()">Cancel</button>
+                    <button class="btn-popup-next" onclick="saveEdit()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStatusFilter = 'all';
+
+        function toggleFilterMenu() { document.getElementById("filterDropdown").classList.toggle("show"); }
+
+        function setStatusFilter(type) {
+            currentStatusFilter = type;
+            document.getElementById("filterDropdown").classList.remove("show");
+            masterFilter();
+        }
+
+        function masterFilter() {
+            const searchText = document.getElementById("searchInput").value.toLowerCase();
+            const dateVal = document.getElementById("filterDate").value;
+            const rows = document.querySelectorAll(".enquiry-row");
+
+            rows.forEach(row => {
+                const rowText = row.innerText.toLowerCase();
+                const statusValue = row.getAttribute('data-status');
+                const textMatch = rowText.includes(searchText);
+                const statusMatch = (currentStatusFilter === 'all' || statusValue.includes(currentStatusFilter));
+
+                let dateMatch = true;
+                if (dateVal) {
+                    const rowDateStr = row.querySelector(".date-cell").innerText.trim();
+                    const rowDate = new Date(rowDateStr).setHours(0,0,0,0);
+                    const filterDate = new Date(dateVal).setHours(0,0,0,0);
+                    if (rowDate !== filterDate) dateMatch = false;
+                }
+                row.style.display = (textMatch && statusMatch && dateMatch) ? "" : "none";
+            });
+        }
+
+        function exportToExcel() {
+            let csv = ["ID,Client Name,Number,Location,Date,Total Amount,Status"];
+            const rows = document.querySelectorAll(".enquiry-row");
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    let cols = row.querySelectorAll("td");
+                    let data = [];
+                    for(let i=0; i<7; i++) data.push('"' + cols[i].innerText.trim() + '"');
+                    csv.push(data.join(","));
+                }
+            });
+            const blob = new Blob([csv.join("\n")], {type: "text/csv"});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url; a.download = "enquiries_list.csv"; a.click();
+        }
+
+        function openAddModal() {
+            document.getElementById('addModeContent').style.display = "block";
+            document.getElementById('editModeContent').style.display = "none";
+            document.getElementById('enquiryModal').classList.add('show');
+        }
+
+        function openEditModal(id, n, m, l, a) {
+            document.getElementById('addModeContent').style.display = "none";
+            document.getElementById('editModeContent').style.display = "block";
+            document.getElementById('formId').value = id;
+            document.getElementById('formName').value = n;
+            document.getElementById('formMobile').value = m;
+            document.getElementById('formLocation').value = l;
+            document.getElementById('formAmount').value = a;
+            document.getElementById('enquiryModal').classList.add('show');
+        }
+
+        function closeModal() { document.getElementById('enquiryModal').classList.remove('show'); }
+
+        function saveEdit() {
+            const id = document.getElementById('formId').value;
+            const data = {
+                name: document.getElementById('formName').value,
+                mobile: document.getElementById('formMobile').value,
+                location: document.getElementById('formLocation').value,
+                total_amount: document.getElementById('formAmount').value
+            };
+            fetch(`/api/update-enquiry/${id}/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                body: JSON.stringify(data)
+            }).then(r => r.json()).then(d => {
+                if(d.status === 'success') window.location.reload();
+            });
+        }
+
+        function deleteItem(id) {
+            if(confirm("Are you sure you want to delete this enquiry?")) {
+                fetch(`/api/delete-enquiry/${id}/`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                }).then(r => r.json()).then(d => {
+                    if(d.status === 'success') window.location.reload();
+                });
+            }
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.btn-filter') && !event.target.closest('.filter-dropdown')) {
+                const dd = document.getElementById("filterDropdown");
+                if(dd) dd.classList.remove("show");
+            }
+        }
+    </script>
+</body>
+</html>
