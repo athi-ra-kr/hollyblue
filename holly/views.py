@@ -207,12 +207,10 @@ def add_accessory(request):
             KitchenAccessory.objects.create(
                 name=request.POST.get('name'),
                 unit_type=request.POST.get('unit_type'),
-                material="STANDARD",
+              
                 price=request.POST.get('price'),
                 image=request.FILES.get('image'),
-                length=request.POST.get('length', 0),
-                depth=request.POST.get('depth', 0),
-                height=request.POST.get('height', 0),
+                
                 specification=request.POST.get('specification', '')
             )
             return JsonResponse({'status': 'success'})
@@ -239,9 +237,7 @@ def update_accessory(request, id):
             item.name = request.POST.get('name', item.name)
             item.unit_type = request.POST.get('unit_type', item.unit_type)
             item.material = request.POST.get('material', item.material)
-            item.length = request.POST.get('length', item.length)
-            item.depth = request.POST.get('depth', item.depth)
-            item.height = request.POST.get('height', item.height)
+            
             item.price = request.POST.get('price', item.price)
             item.specification = request.POST.get('specification', item.specification)
 
@@ -268,9 +264,9 @@ def add_module(request):
         sub_type = request.POST.get('sub_type')
         material = request.POST.get('material')
 
-        length = request.POST.get('length')
-        depth = request.POST.get('depth')
-        height = request.POST.get('height')
+        # length = request.POST.get('length')
+        # depth = request.POST.get('depth')
+        # height = request.POST.get('height')
 
         price = request.POST.get('price')
         specification = request.POST.get('specification')
@@ -285,9 +281,9 @@ def add_module(request):
             category=category,
             sub_type=sub_type,
             material=material,
-            length=length,
-            depth=depth,
-            height=height,
+            # length=length,
+            # depth=depth,
+            # height=height,
             price=price,
             specification=specification,
             image=image
@@ -312,9 +308,9 @@ def update_module(request, id):
             item = GeneralModule.objects.get(id=id)
             item.sub_type = request.POST.get('sub_type', item.sub_type)
             item.material = request.POST.get('material') or item.material
-            item.length = request.POST.get('length', item.length)
-            item.depth = request.POST.get('depth', item.depth)
-            item.height = request.POST.get('height', item.height)
+            # item.length = request.POST.get('length', item.length)
+            # item.depth = request.POST.get('depth', item.depth)
+            # item.height = request.POST.get('height', item.height)
             item.price = request.POST.get('price', item.price)
             item.specification = request.POST.get('specification', item.specification)
 

@@ -116,7 +116,9 @@
                         <th>Material</th>
                         {% endif %}
                         <th>Sub Type</th>
+                        {% if category_name != "Mirror" and category_name != "Texture Paint" %}
                         <th>Dimensions (LxDxH)</th>
+                        {% endif %}
                         <th>Price</th>
                         <th>Image</th>
                         <th>Action</th>
@@ -129,7 +131,9 @@
                         <td>{{ item.material }}</td>
                         {% endif %}
                         <td>{{ item.sub_type|default:"Standard" }}</td>
+                        {% if category_name != "Mirror" and category_name != "Texture Paint" %}
                         <td>{{ item.length }}x{{ item.depth }}x{{ item.height }}</td>
+                        {% endif %}
                         <td style="color:#1a73e8; font-weight:bold;">₹ {{ item.price }}</td>
                         <td>
                             {% if item.image %}
@@ -183,15 +187,16 @@
                     <input type="text" name="sub_type" class="form-input" placeholder="e.g. With Storage">
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Dimensions (mm)</label>
-                    <div style="display:flex; gap:10px;">
-                        <input type="number" name="length" class="form-input" placeholder="L" required>
-                        <input type="number" name="depth" class="form-input" placeholder="D" required>
-                        <input type="number" name="height" class="form-input" placeholder="H" required>
-                    </div>
-                </div>
-
+                {% if category_name != "Mirror" and category_name != "Texture Paint" %}
+<div class="form-group">
+<label class="form-label">Dimensions (mm)</label>
+<div style="display:flex; gap:10px;">
+<input type="number" name="length" class="form-input" placeholder="L" required>
+<input type="number" name="depth" class="form-input" placeholder="D" required>
+<input type="number" name="height" class="form-input" placeholder="H" required>
+</div>
+</div>
+{% endif %}
                 <div class="form-group">
                     <label class="form-label">Price</label>
                     <input type="number" name="price" class="form-input" required>
@@ -238,14 +243,16 @@
                 </div>
                 {% endif %}
 
-                <div class="form-group">
-                    <label class="form-label">Dimensions (mm)</label>
-                    <div style="display:flex; gap:10px;">
-                        <input type="number" id="editL" name="length" class="form-input" required>
-                        <input type="number" id="editD" name="depth" class="form-input" required>
-                        <input type="number" id="editH" name="height" class="form-input" required>
-                    </div>
-                </div>
+                {% if category_name != "Mirror" and category_name != "Texture Paint" %}
+<div class="form-group">
+<label class="form-label">Dimensions (mm)</label>
+<div style="display:flex; gap:10px;">
+<input type="number" id="editL" name="length" class="form-input">
+<input type="number" id="editD" name="depth" class="form-input">
+<input type="number" id="editH" name="height" class="form-input">
+</div>
+</div>
+{% endif %}
 
                 <div class="form-group">
                     <label class="form-label">Price (₹)</label>

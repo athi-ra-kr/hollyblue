@@ -217,7 +217,9 @@ Material: {{ item.material }}
 <td class="spec-text">{{ item.specification }}</td>
 
 <td style="color: #666; font-size: 12px; white-space: nowrap;">
+{% if item.category != "Mirror" and item.category != "Texture Paint" and item.category != "Kitchen Accessories" %}
 {{ item.size }}
+{% endif %}
 </td>
 
 <td class="price-col">₹{{ item.price }}</td>

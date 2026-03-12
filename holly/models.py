@@ -40,9 +40,9 @@ class KitchenAccessory(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='accessories/', blank=True, null=True)
 
-    length = models.IntegerField(default=0)
-    depth = models.IntegerField(default=0)
-    height = models.IntegerField(default=0)
+    # length = models.IntegerField(default=0)
+    # depth = models.IntegerField(default=0)
+    # height = models.IntegerField(default=0)
     specification = models.TextField(blank=True, null=True)
 
     def __str__(self):

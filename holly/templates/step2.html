@@ -251,14 +251,14 @@
         <div class="modal-section"><label class="modal-label">Category</label><input type="text" id="univCategory" class="modal-input modal-input-fixed" readonly></div>
         <div class="modal-section" id="univTypeWrapper" style="display:none;"><label class="modal-label">Type</label><select id="univSubType" class="modal-select" onchange="updateUniversalDetails()"></select></div>
         <div class="modal-section" id="univMaterialWrapper"><label class="modal-label">Material</label><select id="univMaterial" class="modal-select" onchange="updateUniversalDetails()"><option>PLY WITH LAM</option><option>PLY WITH ACRYLIC</option><option>PLY WITH VENEER</option><option>WPC WITH LAM</option></select></div>
-        <div class="modal-section" id="univSizeWrapper"><label class="modal-label">Size</label><select id="univSize" class="modal-select" onchange="renderUniversalSelection()"></select></div>
+        <!-- <div class="modal-section" id="univSizeWrapper"><label class="modal-label">Size</label><select id="univSize" class="modal-select" onchange="renderUniversalSelection()"></select></div> -->
         <div class="spec-body">
             <div class="spec-image-box" id="univImgBox">Image</div>
             <div>
                 <p class="spec-text" id="univSpecText"></p>
                 <p class="spec-meta"><span>Category:</span> <span id="univMetaCat"></span></p>
                 <p class="spec-meta" id="univMetaMatRow"><span>Material:</span> <span id="univMetaMaterial"></span></p>
-                <p class="spec-meta"><span>Size:</span> <span id="univMetaSize"></span></p>
+                <!-- <p class="spec-meta"><span>Size:</span> <span id="univMetaSize"></span></p> -->
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
                     <p class="spec-meta" style="margin:0;"><span>Price:</span> <span id="univMetaPrice" style="font-size:16px; color:#1a73e8;"></span></p>
                     <button class="btn-save" id="univAddBtn" onclick="addUniversalToList()">Add</button>
@@ -311,16 +311,33 @@
     }
 
     function processItemForDisplay(item) {
-        const len = parseFloat(item.length) || 0;
-        const height = parseFloat(item.height) || 0;
-        const price = parseFloat(item.price) || 0;
-        let rate = 0;
-        if (len > 0 && height > 0) {
-            const sqFt = (len * height) / 92903.04;
-            rate = price / sqFt;
-        }
-        return { ...item, currentLen: len, currentHeight: height, currentPrice: price, rate: rate, displaySize: `${len}mm x ${item.depth}mm x ${height}mm` };
+
+    const len = parseFloat(item.length) || 0;
+    const height = parseFloat(item.height) || 0;
+    const price = parseFloat(item.price) || 0;
+
+    let rate = 0;
+
+    if (len > 0 && height > 0) {
+        const sqFt = (len * height) / 92903.04;
+        rate = price / sqFt;
     }
+
+    // REMOVE SIZE FOR MIRROR
+    let displaySize = "";
+    if ((item.category || "").toLowerCase() !== "mirror") {
+        displaySize = `${len}mm x ${item.depth}mm x ${height}mm`;
+    }
+
+    return {
+        ...item,
+        currentLen: len,
+        currentHeight: height,
+        currentPrice: price,
+        rate: rate,
+        displaySize: displaySize
+    };
+}
 
     const categoryButtonMap = {
         "Kitchen": "btn-kitchen", "Kitchen Accessories": "btn-accessories", "TV Unit": "btn-tv",
@@ -392,7 +409,33 @@ else {
             const btnText = isInCart ? "Added ✔" : "Add";
             const btnDisabled = isInCart ? "disabled" : "";
             const div = document.createElement("div"); div.className="acc-item-row";
-            div.innerHTML = `${imgHtml}<div><div class="acc-item-desc">${item.name || item.category}</div><div class="size-edit-wrapper" id="size-wrap-${index}"><span class="acc-item-sub">${item.displaySize}</span><button class="btn-edit-size" onclick="editSize(${index})">Edit</button></div></div><div class="acc-item-price" id="price-txt-${index}">${formatPrice(item.currentPrice)}</div><div style="text-align:right;"><button type="button" class="${btnClass}" ${btnDisabled} onclick="addItemToCart(this, ${index}, '${currentActiveCategory}')">${btnText}</button></div>`;
+            div.innerHTML = `
+${imgHtml}
+<div>
+<div class="acc-item-desc">${item.name || item.category}</div>
+
+${currentActiveCategory !== "Mirror" ? `
+<div class="size-edit-wrapper" id="size-wrap-${index}">
+<span class="acc-item-sub">${item.displaySize}</span>
+<button class="btn-edit-size" onclick="editSize(${index})">Edit</button>
+</div>
+` : ``}
+
+</div>
+
+<div class="acc-item-price" id="price-txt-${index}">
+${formatPrice(item.currentPrice)}
+</div>
+
+<div style="text-align:right;">
+<button type="button"
+class="${btnClass}"
+${btnDisabled}
+onclick="addItemToCart(this, ${index}, '${currentActiveCategory}')">
+${btnText}
+</button>
+</div>
+`;
             container.appendChild(div);
         });
     }
@@ -487,20 +530,21 @@ function addItemToCart(btn, index, typeLabel) {
             items = items.filter(i => i.sub_type === subTypeSel.value);
         } else { subTypeDiv.style.display = "none"; }
         universalItemsCache = items;
-        const sizeSel = document.getElementById("univSize");
-        sizeSel.innerHTML = "";
-        items.forEach(i => { const opt = document.createElement("option"); opt.value = i.id; opt.text = `${i.length}mm x ${i.height}mm`; sizeSel.appendChild(opt); });
+        // const sizeSel = document.getElementById("univSize");
+        // sizeSel.innerHTML = "";
+        // items.forEach(i => { const opt = document.createElement("option"); opt.value = i.id; opt.text = `${i.length}mm x ${i.height}mm`; sizeSel.appendChild(opt); });
         renderUniversalSelection();
     }
 
     function renderUniversalSelection() {
-        const selectedId = document.getElementById("univSize").value;
-        const selectedItem = universalItemsCache.find(i => i.id.toString() === selectedId);
+        const selectedItem = universalItemsCache[0];
+        // const selectedId = document.getElementById("univSize").value;
+        // const selectedItem = universalItemsCache.find(i => i.id.toString() === selectedId);
         const addBtn = document.getElementById("univAddBtn");
         if(selectedItem) {
             document.getElementById("univSpecText").innerText = selectedItem.specification || "";
             document.getElementById("univMetaPrice").innerText = formatPrice(selectedItem.price);
-            document.getElementById("univMetaSize").innerText = `${selectedItem.length}x${selectedItem.height}`;
+            // document.getElementById("univMetaSize").innerText = `${selectedItem.length}x${selectedItem.height}`;
             document.getElementById("univMetaCat").innerText = selectedItem.category;
             document.getElementById("univMetaMaterial").innerText = selectedItem.material || "N/A";
             document.getElementById("univImgBox").innerHTML = selectedItem.image ? `<img src="/media/${selectedItem.image}">` : 'Image / 3D View';
@@ -520,21 +564,32 @@ function addItemToCart(btn, index, typeLabel) {
         container.innerHTML = "";
         const items = dbAccessories.filter(i => (i.unit_type || "").toUpperCase() === unitRaw.toUpperCase());
         items.forEach((item) => {
-             const sizeStr = `${item.length}mm x ${item.depth}mm x ${item.height}mm`;
+             const sizeStr = "";
              const isInCart = cart.some(c => c.title === item.name && c.category === "Kitchen Accessories");
              const row = document.createElement("div"); row.className = "acc-item-row";
-             row.innerHTML = `${item.image ? `<img src="/media/${item.image}" class="acc-item-img">` : `<div class="acc-item-img">No Img</div>`}<div><div class="acc-item-desc">${item.name}</div><div style="font-size:11px;">Size: ${sizeStr}</div></div><div class="acc-item-price">${formatPrice(item.price)}</div><div style="text-align:right;"><button type="button" class="acc-add-btn ${isInCart?'added':''}" ${isInCart?'disabled':''}onclick="addAccessoryToCart(this, '${item.name}', ${item.price}, '${item.material}', '${sizeStr}', '${item.specification || ""}')">${isInCart?'Added':'Add'}</button></div>`;
+             row.innerHTML = `
+${item.image ? `<img src="/media/${item.image}" class="acc-item-img">` : `<div class="acc-item-img">No Img</div>`}
+<div>
+<div class="acc-item-desc">${item.name}</div>
+</div>
+<div class="acc-item-price">${formatPrice(item.price)}</div>
+<div style="text-align:right;">
+<button type="button"
+class="acc-add-btn ${isInCart ? 'added' : ''}"
+${isInCart ? 'disabled' : ''}
+onclick="addAccessoryToCart(this, '${item.name}', ${item.price}, '${item.specification || ""}')">
+${isInCart ? 'Added' : 'Add'}
+</button>
+</div>`;
              container.appendChild(row);
         });
     }
     function selectAllAccessories() { document.querySelectorAll("#accListContainer .acc-add-btn:not(.added)").forEach(btn => btn.click()); }
-    function addAccessoryToCart(btn, name, price, mat, sizeStr, spec) {
-  cart.push({
+    function addAccessoryToCart(btn, name, price, spec) {
+cart.push({
     title: name,
     category: "Kitchen Accessories",
-    specification: spec || "Accessory",
-    material: mat || "N/A",
-    size: sizeStr,
+    specification: spec,
     price: parseFloat(price)
 });
         renderCart(); btn.innerText = "Added"; btn.classList.add("added"); btn.disabled = true; updateMainButtonStates();
@@ -556,11 +611,11 @@ function addItemToCart(btn, index, typeLabel) {
 
 <div class="selected-card-details">
 <strong>Cat:</strong> ${item.category} |
-<strong>Mat:</strong> ${item.material}
+
 <br>
 <strong>Specification:</strong> ${item.specification}
 <br>
-<strong>Size:</strong> ${item.size}
+
 </div>
 
 <div class="selected-card-price">

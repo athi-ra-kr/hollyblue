@@ -1,14 +1,27 @@
-# database
-*.db
-*.sqlite3
-db.sqlite3
-
-# env
-.env
-
-# python cache
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 
-# node modules
-node_modules/
+# Django
+db.sqlite3
+*.sqlite3
+media/
+
+# Environment
+.env
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# migrations cache
+*.log
